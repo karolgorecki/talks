@@ -1,0 +1,132 @@
+Let's Go
+Gophers Katowice #1
+18:30 28 Sep 2015
+Tags: golang, go, katowice, gophers
+
+Karol Górecki
+gopher@karolgorecki.com
+@karolgorecki
+
+
+
+
+* INTRO
+
+* 
+.image go-creators.png 550 _
+.caption Created by: Robert Griesemer, Rob Pike, Ken Thompson 
+
+* Who uses Go?
+- me
+- TODO: add img here
+- [[https://github.com/golang/go/wiki/GoUsers][and more]]
+
+* Main features
+- general purpose
+- strongly typed
+- fast compilation
+- large stdlib
+- concurrency
+- cross-platform
+- garbage collected
+- built-in test framework
+- easy to learn
+- community
+- TODO: img here
+
+* Awww so cute 
+.image gopher.png _ 400
+
+
+
+* SETTING UP ENV
+
+* Installation
+- [[https://golang.org/dl/][Download]]
+- Install
+  tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
+- Set `$GOPATH` - usually `$HOME/go`
+    # Go environment
+    export GOPATH="$HOME/go"
+    # Expose the Go binaries in the PATH
+    export PATH="$GOPATH/bin:$PATH"
+- *$GOPATH* - is used to specify directories outside of `$GOROOT` that contain the source for Go projects and their binaries.
+- *$GOROOT* - set it only if you installed Go in custom location.
+
+* Commands & tools
+- go env - print Go environment information
+- go get - download and install packages and dependencies
+- go build - compile packages and dependencies
+- go run - compile and run Go program
+- gofmt - format go source
+- go test - run tests and benchmarks
+- godoc - shows documentation
+- go tool vet 
+
+* Editors
+- [[https://github.com/joefitzgerald/go-plus][atom]]
+- [[http://goclipse.github.io/][eclipse]]
+- [[http://sourceforge.net/projects/liteide/files/][liteIDE]]
+- [[http://farazdagi.com/blog/2015/vim-as-golang-ide/][vim]]
+- [[https://medium.com/@jgautheron/sublime-text-and-go-2b8af99fc16a][sublime text]]
+- [[https://github.com/golang/go/wiki/IDEsAndTextEditorPlugins][and more]]
+
+* Workspace
+    bin/
+        hello                 # command executable
+    pkg/
+        linux_amd64/          # this will reflect your OS and architecture
+            github.com/user/
+                stringutil.a  # package object
+    src/
+        github.com/user/
+            hello/
+                hello.go      # command source
+            stringutil/
+                reverse.go    # package source
+- *src* - contains Go source files organized into packages (one package per directory)
+- *pkg* - contains package objects
+- *bin* - contains executable commands
+
+* Let's get started
+
+* Packages
+The first statement in a Go source file must be
+
+    package foo
+
+Go's convention is that the *package*name*is*the*last*element*of*the*import*path*: the package imported as "crypto/rot13" should be named rot13.
+
+* Imports
+.image import.png
+
+* Vars
+
+* Functions
+
+* Basic types
+
+* Others constructs
+- pointers
+- structs
+- arrays
+- slices
+- maps
+
+* Interfaces
+
+* Goroutines and channels
+
+* Error handling
+
+* Testing
+
+* Where to start
+- Go tour
+- go something
+- golang weekly
+- gophers katowice ;)
+
+* QUESTIONS ?
+
+
