@@ -8,6 +8,17 @@ gopher@karolgorecki.com
 @karolgorecki
 
 
+* whoami
+
+- full-time front-end developer @Nexway
+- I'm a baby gopher
+- I like to discover new stuff
+- I like to share knowledge
+
+
+
+
+
 
 
 * INTRO
@@ -16,10 +27,14 @@ gopher@karolgorecki.com
 .image go-creators.png 550 _
 .caption Created by: Robert Griesemer, Rob Pike, Ken Thompson 
 
+
 * Who uses Go?
 - me
+- you (I hope)
+- few companies
 - TODO: add img here
-- [[https://github.com/golang/go/wiki/GoUsers][and more]]
+- [[https://github.com/golang/go/wiki/GoUsers][go users]]
+
 
 * Main features
 - general purpose
@@ -34,12 +49,18 @@ gopher@karolgorecki.com
 - community
 - TODO: img here
 
+
 * Awww so cute 
 .image gopher.png _ 400
 
 
 
+
+
+
+
 * SETTING UP ENV
+
 
 * Installation
 - [[https://golang.org/dl/][Download]]
@@ -53,15 +74,17 @@ gopher@karolgorecki.com
 - *$GOPATH* - is used to specify directories outside of `$GOROOT` that contain the source for Go projects and their binaries.
 - *$GOROOT* - set it only if you installed Go in custom location.
 
+
 * Commands & tools
-- go env - print Go environment information
-- go get - download and install packages and dependencies
-- go build - compile packages and dependencies
-- go run - compile and run Go program
-- gofmt - format go source
-- go test - run tests and benchmarks
-- godoc - shows documentation
-- go tool vet 
+- *go*env* - print Go environment information
+- *go*get* - download and install packages and dependencies
+- *go*build* - compile packages and dependencies
+- *go*run* - compile and run Go program
+- *gofmt* - format go source
+- *go*test* - run tests and benchmarks
+- *godoc* - shows documentation
+- *go*tool*vet* - examines Go source code and reports suspicious constructs
+
 
 * Editors
 - [[https://github.com/joefitzgerald/go-plus][atom]]
@@ -70,6 +93,7 @@ gopher@karolgorecki.com
 - [[http://farazdagi.com/blog/2015/vim-as-golang-ide/][vim]]
 - [[https://medium.com/@jgautheron/sublime-text-and-go-2b8af99fc16a][sublime text]]
 - [[https://github.com/golang/go/wiki/IDEsAndTextEditorPlugins][and more]]
+
 
 * Workspace
     bin/
@@ -88,44 +112,335 @@ gopher@karolgorecki.com
 - *pkg* - contains package objects
 - *bin* - contains executable commands
 
-* Let's get started
+
+
+
+
+
+
+
+* LET'S GET STARTED
+
 
 * Packages
 The first statement in a Go source file must be
-
+    
+    // foo/foo.go
     package foo
 
 Go's convention is that the *package*name*is*the*last*element*of*the*import*path*: the package imported as "crypto/rot13" should be named rot13.
 
+Every program should have package main and a function main.
+Libs don't have main package and main function.
+
+
+* Our first program!
+
+.play min.go
+
+
 * Imports
+
 .image import.png
 
-* Vars
 
-* Functions
+* Our first program 2.0!
 
-* Basic types
+.play min2.go
 
-* Others constructs
+.image awesome.jpg _ 400
+
+
+* Types in Go
+- bool
+- numeric types int, uint, float, complex
+- string
+- array
+- slice
+- struct
 - pointers
-- structs
-- arrays
-- slices
-- maps
+- function
+- interface
+- map
+- channel
+- aliases - byte (uint8), rune (int32)
+
+
+* Declaring variables & function 
+
+variables & constants
+
+.code declaration/vars.go
+
+functions
+
+.code declaration/func.go
+
+grouping vars
+
+    var (
+        foo = "Foo"
+        number = 10
+    )
+
+* Ignoring returned value
+In Go we can return multiple values. Sometimes we don't need all of them.
+Compiler will yell at you if you have declared unused variables.
+
+.play -edit makelove.go /^func main/,/^}/
+.code makelove.go /^func getGirls/,/^}/
+
+* I'll give you a clue...
+
+.image ignore.gif
+
+* Arrays & slices
+An array type definition specifies a length and an element type. It has fixed size.
+Array length is part of its type ([4]int and [5]int are distinct, incompatible types)
+
+  var a [4]int
+  b := [2]string{"Penn", "Teller"}
+  b := [...]string{"Penn", "Teller"}
+
+
+The slice type is an abstraction built on top of Go's array type.
+A slice literal is declared just like an array literal, except you leave out the element count:
+
+    letters := []string{"a", "b", "c", "d"}
+
+A slice can be created with the built-in function called make
+
+    s = make([]byte, 5, 5)
+    // s == []byte{0, 0, 0, 0, 0}
+    len(s) == 5
+    cap(s) == 5
+
+* Maps
+A Go map type looks like this: 
+
+    map[KeyType]ValueType
+
+Declare & init
+
+    var m map[string]int
+    m = make(map[string]int)
+    m["foo"] = 100
+
+    commits := map[string]int{
+        "rsc": 3711,
+        "r":   2138,
+        "gri": 1908,
+        "adg": 912,
+    }
+
+Get
+
+    val = m["route"]
+    val, ok := m["route"]
+
+* Maps
+Remove elements
+
+    delete(m, "route")
+
+Range over maps
+
+    for key, value := range m {
+        fmt.Println("Key:", key, "Value:", value)
+    }
+* Structs
+A struct is a type which contains named fields
+
+    type Circle struct {
+      x float64
+      y float64
+      r float64
+    }
+
+Initialization
+
+    var c Circle
+    // allocates memory for the fields & sets them to their zero value. Returns a pointer (*Circle)
+
+    c := new(Circle) 
+    c := &Circle{}
+
+    c := Circle{x: 0, y: 0, r: 5}
+    c := Circle{0, 0, 5} // we can leave off the field names if we know the order
+
+Accessing fields
+
+    c.x = 10
+
+* Structs
+Methods
+
+    func (c *Circle) area() float64 {
+      return math.Pi * c.r*c.r
+    }
+
+    fmt.Println(c.area())
+
+Embeding types
+
+    type Person struct {
+      Name string
+    }
+
+    func (p *Person) Talk() {
+      fmt.Println("Hi, my name is", p.Name)
+    }
+
+    type Android struct {
+      Person
+      Model string
+    }
+
+* Learning how to export things by making some french fries
+
+.image fries.jpg  _ 800
+
+* What do we have here...
+.code basement/basement.go
+
+The identifier is exported when the first character of the identifier's name is a Unicode upper case letter.
+
+* GF make me some fries
+
+.play gf/gf.go
+
+
+
+
+* Branching
+
+basic if
+
+  if 2 == 2 {
+
+  }
+
+if with expression
+
+  if two := getTwo(); two == 2 {
+
+  } else {
+
+  }
+
+
+* Branching
+switch
+
+    switch {
+    case 2 == 2:
+        genius()
+    default:
+        cantDoMath()
+    }
+
+    switch getAnimals() {
+    case 'cat':
+        // we've got a cat
+    case 'dog':
+        // we've go a doge
+    }
+
+    switch getNumber() {
+        case 0,2,4,6,8,10:
+            // we've got even nb
+        case 1,3,5,7,9:
+            // we've got odd nb
+        default:
+            // hard to say
+    }
+
+* Branching
+select
+
+
+* Looping
+
+    // C like loop
+    for i:=0; i < 10; i++ {
+        doSomeCrazyStuff()
+    }
+
+    // while loop
+    for j < 100 {
+        drinkBeers()
+    }
+
+    // forever loop
+    for {
+        alone()
+    }
+
+.image forever.jpeg
+
+
+* go go power range(s)
+
+    for key, value := range someMap {
+        fmt.Println(key,value)
+    }
+
+.iframe https://www.youtube.com/embed/HDLwmcokt9M?rel=0&amp;controls=0&amp;showinfo=0 500 978
 
 * Interfaces
 
+    type worker interface {
+        SaySomething()
+        Work() (results int)
+    } 
+
+    type programmer struct {
+        name string
+        cash uint32,
+        energy
+    }
+
+    func (p programmer) SaySomething() {
+        fmt.Println("It was working on my computer")
+    }
+    func (p programmer) Work() {
+        fmt.Println("drinking coffee");
+        p.energy += 50
+        fmt.Println("...coding")
+        return 0
+    }
+
+    var w worker
+    w = newProgrammer("John Doe",10000,100)
+    w.Work()
+
+
 * Goroutines and channels
+
+
 
 * Error handling
 
-* Testing
+  res, err := getProducts()
+  if err != nil {
+    // handle the error
+  }
 
-* Where to start
-- Go tour
-- go something
-- golang weekly
-- gophers katowice ;)
+  if _, err := getProduct(); err != nil {
+    // handle error
+  }
+
+* What's next
+- [[https://tour.golang.org/welcome/1][Golang tour]]
+- [[https://golang.org/doc/code.html][How to write Go code]]
+- [[https://golang.org/doc/effective_go.html][Effective Go]]
+- [[https://github.com/golang/go/wiki/CodeReviewComments][Go code review comments]]
+- [[https://groups.google.com/forum/#!forum/golang-nuts][Golang-nuts]]
+- [[http://golangweekly.com/][Subscribe to Golang weekly newsletter]]
+- [[https://www.youtube.com/channel/UCO3LEtymiLrgvpb59cNsb8A][Check the official Youtube channel]]
+- [[https://www.reddit.com/r/golang][golang on Reddit]]
+- [[https://gophers.slack.com/messages/katowice/][Join gophers on Slack]]
+- [[https://www.youtube.com/watch?v=dQw4w9WgXcQ][Purchase license on golang.com/licenses]]
 
 * QUESTIONS ?
 
