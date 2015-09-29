@@ -5,62 +5,24 @@ Tags: golang, go, katowice, gophers
 
 Karol Górecki
 gopher@karolgorecki.com
-@karolgorecki
 
-
-* whoami
-
-- full-time front-end developer @Nexway
-- I'm a baby gopher
-- I like to discover new stuff
-- I like to share knowledge
-
-
-
-
-
-
-
-* INTRO
+* quick intro
 
 * 
 .image go-creators.png 550 _
-.caption Created by: Robert Griesemer, Rob Pike, Ken Thompson 
+.caption Created by: [[https://en.wikipedia.org/wiki/Robert_Griesemer][Robert Griesemer]], [[https://pl.wikipedia.org/wiki/Rob_Pike][Rob Pike]], [[https://pl.wikipedia.org/wiki/Ken_Thompson][Ken Thompson]] 
 
 
 * Who uses Go?
-- me
-- you (I hope)
-- few companies
-- TODO: add img here
-- [[https://github.com/golang/go/wiki/GoUsers][go users]]
+.image gousers.png
+
+- [[https://github.com/golang/go/wiki/GoUsers][more go users]]
+
+* 
+.image feat.jpg _ 920
 
 
-* Main features
-- general purpose
-- strongly typed
-- fast compilation
-- large stdlib
-- concurrency
-- cross-platform
-- garbage collected
-- built-in test framework
-- easy to learn
-- community
-- TODO: img here
-
-
-* Awww so cute 
-.image gopher.png _ 400
-
-
-
-
-
-
-
-* SETTING UP ENV
-
+* setting up the env
 
 * Installation
 - [[https://golang.org/dl/][Download]]
@@ -75,7 +37,7 @@ gopher@karolgorecki.com
 - *$GOROOT* - set it only if you installed Go in custom location.
 
 
-* Commands & tools
+* Few commands & tools
 - *go*env* - print Go environment information
 - *go*get* - download and install packages and dependencies
 - *go*build* - compile packages and dependencies
@@ -113,14 +75,7 @@ gopher@karolgorecki.com
 - *bin* - contains executable commands
 
 
-
-
-
-
-
-
-* LET'S GET STARTED
-
+* basics
 
 * Packages
 The first statement in a Go source file must be
@@ -133,36 +88,30 @@ Go's convention is that the *package*name*is*the*last*element*of*the*import*path
 Every program should have package main and a function main.
 Libs don't have main package and main function.
 
+The simplest go program
 
-* Our first program!
+    package main
 
-.play min.go
+    func main() {}
 
 
-* Imports
+* How imports work?
 
 .image import.png
 
 
-* Our first program 2.0!
-
-.play min2.go
-
-.image awesome.jpg _ 400
-
-
 * Types in Go
-- bool
-- numeric types int, uint, float, complex
-- string
-- array
-- slice
-- struct
+- bools
+- numerics types ints, uints, floats, complexs
+- strings
+- arrays
+- slices
+- structs
 - pointers
-- function
-- interface
-- map
-- channel
+- functions
+- interfaces
+- maps
+- channels
 - aliases - byte (uint8), rune (int32)
 
 
@@ -170,11 +119,19 @@ Libs don't have main package and main function.
 
 variables & constants
 
-.code declaration/vars.go
+    var foo string
+    var foo string = "Foo"
+    var foo = "Foo"
+    foo := "Foo" // short assignment, can't be used in global scope
+    const string = "Foo"
 
 functions
 
-.code declaration/func.go
+    func foo() {}
+    func foo(name string) {}
+    func foo() string {}
+    func foo() (name string) {}
+
 
 grouping vars
 
@@ -187,12 +144,19 @@ grouping vars
 In Go we can return multiple values. Sometimes we don't need all of them.
 Compiler will yell at you if you have declared unused variables.
 
-.play -edit makelove.go /^func main/,/^}/
-.code makelove.go /^func getGirls/,/^}/
+Use *underscore* to ignore returned values.
 
-* I'll give you a clue...
+    _, err := getProducts()
 
-.image ignore.gif
+* Exporting
+The identifier is exported when the first character of the identifier's name is a Unicode upper case letter.
+
+    // can be used by other packages
+    var ExportedFoo = "foo"
+
+    // can be used only in this package
+    var notExportedMoo = "moo"
+
 
 * Arrays & slices
 An array type definition specifies a length and an element type. It has fixed size.
@@ -233,21 +197,12 @@ Declare & init
         "adg": 912,
     }
 
-Get
+Get & delete
 
     val = m["route"]
     val, ok := m["route"]
-
-* Maps
-Remove elements
-
     delete(m, "route")
 
-Range over maps
-
-    for key, value := range m {
-        fmt.Println("Key:", key, "Value:", value)
-    }
 * Structs
 A struct is a type which contains named fields
 
@@ -296,68 +251,52 @@ Embeding types
       Model string
     }
 
-* Learning how to export things by making some french fries
-
-.image fries.jpg  _ 800
-
-* What do we have here...
-.code basement/basement.go
-
-The identifier is exported when the first character of the identifier's name is a Unicode upper case letter.
-
-* GF make me some fries
-
-.play gf/gf.go
 
 
 
+* Branching - if
 
-* Branching
-
-basic if
+In Go the expresion must return a bool value
 
   if 2 == 2 {
-
+    // do some action
   }
 
-if with expression
+The expression may be preceded by a simple statement, which executes before the expression is evaluated.
 
   if two := getTwo(); two == 2 {
-
+    // you can use "two" here. It's local var
   } else {
-
+    // you can use "two" here. It's local var
   }
 
 
-* Branching
-switch
+* Branching - switch
 
     switch {
-    case 2 == 2:
-        genius()
+    case x > 2:
+        doSomeAction()
     default:
-        cantDoMath()
+        defaultAction()
     }
 
     switch getAnimals() {
-    case 'cat':
-        // we've got a cat
-    case 'dog':
-        // we've go a doge
+    case "grumpyCat":
+        fallthrough
+    case "cat":
+        fmt.Println("Meeeowww")
+    case "dog":
+        fmt.Println("Woofff")
     }
 
-    switch getNumber() {
-        case 0,2,4,6,8,10:
-            // we've got even nb
-        case 1,3,5,7,9:
-            // we've got odd nb
-        default:
-            // hard to say
+    switch getNumber(); {
+    case 0,2,4,6,8,10:
+        // we've got even nb
+    case 1,3,5,7,9:
+        // we've got odd nb
+    default:
+        // hard to say
     }
-
-* Branching
-select
-
 
 * Looping
 
@@ -376,72 +315,107 @@ select
         alone()
     }
 
-.image forever.jpeg
-
-
-* go go power range(s)
+Range
 
     for key, value := range someMap {
         fmt.Println(key,value)
     }
 
-.iframe https://www.youtube.com/embed/HDLwmcokt9M?rel=0&amp;controls=0&amp;showinfo=0 500 978
 
 * Interfaces
 
     type worker interface {
-        SaySomething()
-        Work() (results int)
+        work() (results int)
     } 
 
     type programmer struct {
         name string
-        cash uint32,
-        energy
+        cash uint32
+        energy int
     }
 
-    func (p programmer) SaySomething() {
-        fmt.Println("It was working on my computer")
-    }
-    func (p programmer) Work() {
-        fmt.Println("drinking coffee");
-        p.energy += 50
-        fmt.Println("...coding")
-        return 0
+    func (p programmer) work() {
+        // implement the work method
     }
 
     var w worker
-    w = newProgrammer("John Doe",10000,100)
-    w.Work()
+    w = newProgrammer("John Doe",100)
+    w.work()
 
+
+* Goroutines
+A goroutine is a function that is capable of running concurrently with other functions.
+Creating goroutine
+
+    go someFunction()
+
+ 
+    package main
+
+    import (
+        "time"
+
+        "fmt"
+    )
+
+    func main() {
+
+        go func() {
+            fmt.Println("Hello from Goroutine")
+        }()
+
+        fmt.Println("Hello World")
+        time.Sleep(time.Second * 1)
+    }
+
+* Channels - unbuffered
+
+.image cblock.png _ 600
+
+    ch := make(chan int)
+    
+* Channels - buffered
+
+.image cbuf.png _ 600
+
+    ch := make(chan int, 10)
+    ch <- 100 // adding vals to channel
+    <-ch // getting vals from channel
+
+    ch, ok := <- ch // ok tells if the channel is open/closed
 
 * Goroutines and channels
 
+    package main
+
+    import "fmt"
+
+    func main() {
+
+        c := make(chan int)
+
+        go func() {
+            for i := 0; i < 10; i++ {
+                c <- i
+            }
+
+            close(c)
+        }()
+
+        fmt.Println(<-c)
+        fmt.Println(<-c)
+        fmt.Println(<-c)
+    }
 
 
-* Error handling
-
-  res, err := getProducts()
-  if err != nil {
-    // handle the error
-  }
-
-  if _, err := getProduct(); err != nil {
-    // handle error
-  }
-
-* What's next
-- [[https://tour.golang.org/welcome/1][Golang tour]]
-- [[https://golang.org/doc/code.html][How to write Go code]]
-- [[https://golang.org/doc/effective_go.html][Effective Go]]
-- [[https://github.com/golang/go/wiki/CodeReviewComments][Go code review comments]]
-- [[https://groups.google.com/forum/#!forum/golang-nuts][Golang-nuts]]
+* To learn more
+- [[https://tour.golang.org/welcome/1][Take golang tour]]
+- [[https://golang.org/doc/code.html][Read how to write Go code]]
+- [[https://golang.org/doc/effective_go.html][Read about Effective Go]]
+- [[https://github.com/golang/go/wiki/CodeReviewComments][Check the Go code review comments]]
+- [[https://groups.google.com/forum/#!forum/golang-nuts][Visit Golang-nuts]]
 - [[http://golangweekly.com/][Subscribe to Golang weekly newsletter]]
 - [[https://www.youtube.com/channel/UCO3LEtymiLrgvpb59cNsb8A][Check the official Youtube channel]]
-- [[https://www.reddit.com/r/golang][golang on Reddit]]
-- [[https://gophers.slack.com/messages/katowice/][Join gophers on Slack]]
+- [[https://www.reddit.com/r/golang][Check out golang on Reddit]]
+- [[https://gophers.slack.com/messages/katowice/][join gophers on Slack]]
 - [[https://www.youtube.com/watch?v=dQw4w9WgXcQ][Purchase license on golang.com/licenses]]
-
-* QUESTIONS ?
-
-
