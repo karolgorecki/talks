@@ -1,0 +1,189 @@
+#--------------------------------------------------------------------#
+Structuring Go projects
+Gophers Katowice #7
+18:00 20 Mar 2017
+Tags: structure, basic, first-steps,
+
+Karol Górecki
+
+
+#--------------------------------------------------------------------#
+* Why?
+
+- Can be hard in the beginning to structure the app
+- There are no official Gophers rules how to structure your application
+- Every application has different layout / code organization
+- W/o good strategy the code will be harder to reason about / maintain / test etc...
+
+
+#--------------------------------------------------------------------#
+* Packages - quick reminder
+- Go applications are made up of packages
+- The first statement in Go source file must be package declaration
+- Entry point for each application is package main, function main
+- Libraries don't have package & function main
+- Package name should be the last element of the import path ([a-z0-9])
+- Package could be split into multiple files
+- All files for a package live in one directory
+- Packages cannot have circular dependencies
+
+  package main
+
+  import "fmt"
+
+  func main() {
+    fmt.Println("Hello Gophers!")
+  }
+
+
+#--------------------------------------------------------------------#
+* Common approaches
+
+*Monolithic*package* - throwing all your code into one file. It can work well for small applications. No dependencies, no circular dependency issue.
+Problems: cannot use application as a library, it can have only one app binary.
+
+*Grouping*by*function* - grouping code by it's functional type. Putting all handlers in handlers file, controllers into controllers file etc.
+Problems: Can lead to poor naming controller.UserController and circular dependency issue if types references each other.
+
+*Grouping*by*module* - similar to above except that we group the code by modules instead of function. We could have e.g: user, account.
+Problems: Like before we could have poor naming: user.User and circular dependencies issue if user.Controller references account.Controller and vice versa.
+
+
+#--------------------------------------------------------------------#
+* Better approach
+
+- Avoid using global configuration / variables
+- Split project into library and binary (library driven development)
+- Root folder for domain types, implementation in subpackages
+
+
+#--------------------------------------------------------------------#
+* Global variables / configuration
+
+A trivial example server is:
+
+
+  package main
+
+  import (
+    "io"
+    "net/http"
+    "log"
+  )
+
+  // hello world, the web server
+  func HelloServer(w http.ResponseWriter, req *http.Request) {
+    io.WriteString(w, "hello, world!\n")
+  }
+
+  func main() {
+    http.HandleFunc("/hello", HelloServer)
+    log.Fatal(http.ListenAndServe(":12345", nil))
+  }
+
+
+#--------------------------------------------------------------------#
+* Better
+
+  type HelloHandler struct {
+      db *sql.DB
+  }
+  func (h *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+      var name string
+      // Execute the query.
+      row := h.db.QueryRow(“SELECT myname FROM mytable”)
+      if err := row.Scan(&name); err != nil {
+          http.Error(w, err.Error(), 500)
+          return
+      }
+      // Write it back to the client.
+      fmt.Fprintf(w, “hi %s!\n”, name)
+  }
+
+#--------------------------------------------------------------------#
+* Better
+
+  ...
+
+  func helloHandler(db *sql.DB) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+      // handle it
+  }
+
+  func withMetrics(l *log.Logger, next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+      began := time.Now()
+      next.ServeHTTP(w, r)
+      l.Printf("%s %s took %s", r.Method, r.URL, time.Since(began))
+    })
+  }
+
+  func main() {
+    db, err := sql.Open("postgres", "…")
+    if err != nil {
+      log.Fatal(err)
+    }
+    logger := log.New(os.Stdout, "", 0)
+    http.Handle("/hello", helloHandler(db))
+    http.Handle("/hello_again", withMetrics(logger, helloHandler(db)))
+    http.ListenAndServe(":8080", nil)
+  }
+
+
+#--------------------------------------------------------------------#
+* Library driven development
+
+  /adder
+    ...
+    /cmd
+      /addercli
+      /addersrv
+      /makecoffee
+
+
+- Building app from the perspective of a library - Helps to make a clean abstraction of what code is core logic (lib) and what code is running the app (bin)
+- Treat app binary as a client for lib - App bin is a interface for how the user interacts with your logic. 
+- The main package will tie all packages
+
+  go get github.com/someuser/hello/cmd/...
+
+Will install all commands: addcli, addsrv, makecoffee
+
+
+#--------------------------------------------------------------------#
+* Root folder for domain types, implementation in subpackages
+
+- In root folder place high-level domain types. E.g: for e-commerce we could have: Customers, Cart, Payment.
+- The root package should be independent, it shouldn't depend on other packages in your app.
+- The dependencies / implementations can be pushed into subpackages.
+
+  /myapp
+    /users/ // contains e.g UserService
+      /mysql // contains implementation
+    /http
+
+
+* 
+  package main
+
+  import (
+    "github.com/someuser/myapp"
+    "github.com/someuser/myapp/mysql"
+    "github.com/someuser/myapp/http"
+  )
+
+  func main() {
+    db, err := mysql.Open("SomeDB")
+    if err != nil {
+     // handle err
+    }
+    defer db.Close()
+
+    us := &mysql.UserService{DB: db}
+
+    // Attach to HTTP handler.
+    var h http.Handler
+    h.UserService = us
+    
+    // start http server...
+  }
